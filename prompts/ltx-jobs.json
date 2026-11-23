@@ -73,22 +73,22 @@
       "image": "sources/fly-barista.jpg",
       "prompt": "Aerial drone shot gliding very slowly and steadily forward along the street of pastel art deco hotels and palm trees, a smooth continuous push-in, no turns, no shake. A few classic cars drive along the street, palm fronds sway, small waves roll onto the beach, soft afternoon haze, the light stays exactly the same. One continuous take, no cuts, no text."
     },
-    "turn-nurse": {
+    "turn-biker": {
       "model": "ltx-2-5-pro",
       "resolution": "1920x1080",
       "fps": 24,
       "duration": 8,
       "camera_motion": "static",
-      "image": "sources/nurse.jpg",
+      "image": "sources/biker.jpg",
       "prompt": "Tripod shot, medium close-up, the framing never changes: the camera does not move, does not zoom and does not push in; the man stays the same size in the frame from the first to the last frame, with the same space above his head. Slow motion. His shoulders, torso, leather vest and arms stay frozen in side profile; only his head and neck turn, very slowly and at one even speed over the whole shot, from strict side profile toward the camera, and his eyes meet the lens only at the very end. Calm, serious face, mouth closed, toothpick still, no talking. Same man, same bald tattooed head, grey beard, red bandana and vest, same plain hazy sky background. One continuous take, no cuts, no text, no logos."
     },
-    "fly-nurse": {
+    "fly-biker": {
       "model": "ltx-2-5-pro",
       "resolution": "1920x1080",
       "fps": 24,
       "duration": 8,
       "camera_motion": "static",
-      "image": "sources/fly-nurse.jpg",
+      "image": "sources/fly-biker.jpg",
       "prompt": "Aerial drone shot gliding very slowly and steadily forward along the Overseas Highway bridge toward the setting sun, a smooth continuous push-in, no turns, no shake. A few cars drive along the bridge with headlights on, palm fronds sway gently in the warm wind on the small island, soft ripples and golden reflections move on the water, the sun stays on the horizon and the light stays exactly the same. One continuous take, no cuts, no text."
     },
     "turn-builder": {

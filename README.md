@@ -54,7 +54,7 @@ cp .env.example .env              # put your LTX API key in it (create one at ht
 python tools/ltx.py video prompts/ltx-jobs.json turn-baker --budget 25
 python tools/ltx.py alpha footage/turn-baker --budget 25
 python tools/ltx.py video prompts/ltx-jobs.json fly-baker --budget 25
-python tools/pack.py turn footage/turn-baker/source.mp4 footage/turn-baker/matte.mp4 baker --to 68   # baker 68, pump 74, suit 74, barista 88, nurse 84, builder 74
+python tools/pack.py turn footage/turn-baker/source.mp4 footage/turn-baker/matte.mp4 baker --to 68   # baker 68, pump 74, suit 74, barista 88, biker 84, builder 74
 python tools/pack.py city footage/fly-baker/source.mp4 baker
 ```
 
