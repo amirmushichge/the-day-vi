@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+footage/
+.vercel
+node_modules/

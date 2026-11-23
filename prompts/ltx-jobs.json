@@ -1,0 +1,113 @@
+{
+  "_note": "LTX-2.5 Pro jobs for the six people (head turn) and their six hours (flyover). Start frames are in sources/. Run: python tools/ltx.py video prompts/ltx-jobs.json <job> --budget 25",
+  "jobs": {
+    "turn-baker": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/baker.jpg",
+      "prompt": "Tripod shot, medium close-up, the framing never changes: the camera does not move, does not zoom and does not push in; the man stays the same size in the frame from the first to the last frame, with the same space above his head. Slow motion. His shoulders, torso, clothes and arms stay frozen in side profile; only his head and neck turn, very slowly and at one even speed over the whole shot, from strict side profile toward the camera, and his eyes meet the lens only at the very end. Calm, serious face, mouth closed, no talking. Same man, same dreadlocks, white paper baker hat, mint guayabera and gold chain, same plain hazy sky background. One continuous take, no cuts, no text, no logos."
+    },
+    "fly-baker": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/fly-baker.jpg",
+      "prompt": "Aerial drone shot gliding very slowly and steadily forward low over the Everglades, a smooth continuous push-in along the channel, no turns, no shake. The airboat speeds away along the dark water leaving a pale wake, low mist drifts over the sawgrass, the light stays exactly the same, deep blue pre-dawn. One continuous take, no cuts, no text."
+    },
+    "turn-pump": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/pump.jpg",
+      "prompt": "Tripod shot, medium close-up, the framing never changes: the camera does not move, does not zoom and does not push in; the man stays the same size in the frame from the first to the last frame, with the same space above his head. Slow motion. His shoulders, torso, clothes and arms stay frozen in side profile; only his head and neck turn, very slowly and at one even speed over the whole shot, from strict side profile toward the camera, and his eyes meet the lens only at the very end. Calm, serious face, mouth closed, no talking. Same man, same sun-bleached hair, orange sunglasses on his head, zinc on his nose and red lifeguard tank, same plain hazy sky background. One continuous take, no cuts, no text, no logos."
+    },
+    "fly-pump": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/fly-pump.jpg",
+      "prompt": "Aerial drone shot gliding very slowly and steadily forward along the beach toward the rising sun, a smooth continuous push-in, no turns, no shake. Gentle turquoise waves roll onto the sand, palm fronds sway in the sea breeze, golden glints move on the water, the light stays exactly the same. One continuous take, no cuts, no text."
+    },
+    "turn-suit": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/suit.jpg",
+      "prompt": "Tripod shot, medium close-up, the framing never changes: the camera does not move, does not zoom and does not push in; the man stays the same size in the frame from the first to the last frame, with the same space above his head. Slow motion. His shoulders, torso, clothes and arms stay frozen in side profile; only his head and neck turn, very slowly and at one even speed over the whole shot, from strict side profile toward the camera, and his eyes meet the lens only at the very end. Calm, serious face, mouth closed, no talking. Same man, same bald head, pink linen jacket, turquoise t-shirt and gold watch, same plain hazy sky background. One continuous take, no cuts, no text, no logos."
+    },
+    "fly-suit": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/fly-suit.jpg",
+      "prompt": "Aerial drone shot gliding very slowly and steadily forward over the bay, following two speedboats that cut long white wakes toward the downtown skyline, a smooth continuous push-in, no turns, no shake. Sunlight sparkles on the turquoise water, the light stays exactly the same. One continuous take, no cuts, no text."
+    },
+    "turn-barista": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/barista.jpg",
+      "prompt": "Tripod shot, medium close-up, the framing never changes: the camera does not move, does not zoom and does not push in; the woman stays the same size in the frame from the first to the last frame, with the same space above her head. Slow motion. Her shoulders, torso, clothes and arms stay frozen in side profile; only her head and neck turn, very slowly and at one even speed over the whole shot, from strict side profile toward the camera, and her eyes meet the lens only at the very end. Calm, serious face, mouth closed, no talking. Same woman, same pink hibiscus in her hair bun, gold hoop earrings, coral lipstick and flamingo-print shirt, same plain hazy sky background. One continuous take, no cuts, no text, no logos."
+    },
+    "fly-barista": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/fly-barista.jpg",
+      "prompt": "Aerial drone shot gliding very slowly and steadily forward along the street of pastel art deco hotels and palm trees, a smooth continuous push-in, no turns, no shake. A few classic cars drive along the street, palm fronds sway, small waves roll onto the beach, soft afternoon haze, the light stays exactly the same. One continuous take, no cuts, no text."
+    },
+    "turn-nurse": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/nurse.jpg",
+      "prompt": "Tripod shot, medium close-up, the framing never changes: the camera does not move, does not zoom and does not push in; the man stays the same size in the frame from the first to the last frame, with the same space above his head. Slow motion. His shoulders, torso, leather vest and arms stay frozen in side profile; only his head and neck turn, very slowly and at one even speed over the whole shot, from strict side profile toward the camera, and his eyes meet the lens only at the very end. Calm, serious face, mouth closed, toothpick still, no talking. Same man, same bald tattooed head, grey beard, red bandana and vest, same plain hazy sky background. One continuous take, no cuts, no text, no logos."
+    },
+    "fly-nurse": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/fly-nurse.jpg",
+      "prompt": "Aerial drone shot gliding very slowly and steadily forward along the Overseas Highway bridge toward the setting sun, a smooth continuous push-in, no turns, no shake. A few cars drive along the bridge with headlights on, palm fronds sway gently in the warm wind on the small island, soft ripples and golden reflections move on the water, the sun stays on the horizon and the light stays exactly the same. One continuous take, no cuts, no text."
+    },
+    "turn-builder": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/builder.jpg",
+      "prompt": "Tripod shot, medium close-up, the framing never changes: the camera does not move, does not zoom and does not push in; the woman stays the same size in the frame from the first to the last frame, with the same space above her head. Slow motion. Her shoulders, torso, clothes and arms stay frozen in side profile; only her head and neck turn, very slowly and at one even speed over the whole shot, from strict side profile toward the camera, and her eyes meet the lens only at the very end. Calm, serious face, mouth closed, no talking. Same woman, same white hard hat with pink sunglasses on the brim, orange safety vest and palm-print shirt, same plain hazy sky background. One continuous take, no cuts, no text, no logos."
+    },
+    "fly-builder": {
+      "model": "ltx-2-5-pro",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration": 8,
+      "camera_motion": "static",
+      "image": "sources/fly-builder.jpg",
+      "prompt": "Aerial drone shot gliding very slowly and steadily forward along the causeway toward the lit skyline at night, a smooth continuous push-in, no turns, no shake. Streams of red tail lights and white headlights flow in both directions, neon reflections ripple on the dark water, the lights of the cruise ships glow, the light stays exactly the same. One continuous take, no cuts, no text."
+    }
+  }
+}

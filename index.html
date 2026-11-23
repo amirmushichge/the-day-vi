@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Day VI</title>
+<meta name="description" content="19.11. Six people in Miami turn to the camera, one by one, with the city running through them. A double exposure in motion.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,900&family=Barlow:wght@500;700&family=Barlow+Condensed:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* One 1920×1080 title card that never scrolls: each wheel notch, swipe or key plays one scene on a fixed clock: a
+     person's head turns toward the camera while the camera pushes in, then holds; the city of their hour runs through them and, blurred under fog, behind them;
+     a warm light bloom inside the picture hands over to the next one. */
+  :root {
+    --bar: #0b0c0d;
+    --hot: #ff3b5c;                                    /* sunset coral-pink, the one hot ink */
+    --sky1: #c2246e;                                   /* the finale's sky: magenta above */
+    --sky2: var(--hot);
+    --sky3: #ffa03a;                                   /* amber at the horizon */
+    --ink: #13191b;
+    --paper: #f3ead9;
+    --mass: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --type: "Barlow", "Helvetica Neue", Arial, sans-serif;
+    --credit: "Barlow Condensed", "Arial Narrow", sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--bar); overscroll-behavior: none; }
+  body { color: var(--paper); font-family: var(--type); touch-action: none; }
+
+  .stage { position: fixed; inset: 0; display: grid; place-items: center; overflow: hidden; }
+  .fit { width: 1920px; height: 1080px; transform-origin: center center; flex: none; position: relative; }
+
+  /* the picture between the bars; everything that moves stays inside it */
+  .pic { position: absolute; left: 0; right: 0; top: 138px; height: 804px; overflow: hidden; background: #dfe7e7; }
+  .pic > * { position: absolute; }
+  #bg { inset: 0; overflow: hidden; }
+  .bgcity { position: absolute; inset: -24px; width: calc(100% + 48px); height: calc(100% + 48px); object-fit: cover; filter: blur(7px) saturate(0.7); }
+  /* the haze takes the colour of each person's hour; it changes under the cut */
+  .fog { inset: 0; background: radial-gradient(120% 90% at 50% 38%, var(--f1, #eef3f3) 0%, var(--f2, #dfe7e7) 55%, var(--f3, #cfd9d9) 100%); opacity: 0.8; }
+  /* palm fronds throw a slow, swaying shadow on the wall behind the person: over the haze and the painted VI, never on the people */
+  /* a summer flyover under the VI, half seen through the sky colour, so the background is a place, not a wall */
+  .summer { inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; mix-blend-mode: var(--sumb, soft-light); opacity: var(--sumo, 0.75); }
+  .palms { inset: -60px -80px; background: url(media/palms.jpg) center / cover no-repeat; mix-blend-mode: multiply; opacity: var(--palm, 0.3);
+           transform-origin: 50% -20%; animation: sway 9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; pointer-events: none; }
+  /* a pale light behind the person: the sky glows around the head, and soft hair edges sit on light instead of colour */
+  .glow { inset: 0; pointer-events: none; mix-blend-mode: screen; opacity: var(--glow, 1);
+          background: radial-gradient(34% 58% at 52.5% 36%, rgba(255, 240, 232, 0.95) 0%, rgba(255, 222, 214, 0.72) 38%, rgba(255, 196, 206, 0.28) 66%, rgba(255, 190, 205, 0) 100%); }
+  @keyframes sway { 0% { transform: rotate(-0.7deg) translateX(-14px); } 100% { transform: rotate(0.7deg) translateX(14px); } }
+  .vi { left: 0; right: 0; top: -235px; text-align: center; white-space: nowrap; color: var(--hot);
+        font: 900 1290px/1 var(--mass); font-stretch: 125%; letter-spacing: 0.07em; padding-left: 0.07em; }
+  #person { left: 260px; top: -40px; width: 1500px; height: 844px; transform-origin: 50% 46%; will-change: transform; }
+  .type { inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .type text { font-family: var(--type); font-weight: 700; fill: var(--ink); }
+  .lit .type text { filter: drop-shadow(3px 4px 0 rgba(43, 18, 82, 0.55)); }
+  .lit .type text.sm { filter: drop-shadow(1px 1.5px 0 rgba(43, 18, 82, 0.6)); }
+  .lit .type .end { fill: #ffffff; }
+  .flat .type text, .flat .type text.sm { filter: none; }
+  .grain { inset: 0; width: 100%; height: 100%; opacity: 0.12; mix-blend-mode: multiply; pointer-events: none; }
+
+  /* the cut between people: police lights. Red and blue strobe from the two sides, then a white-hot flare covers the
+     swap and fades with the colours at its edges; the bars stay black */
+  /* police lights, drawn every frame: an LED light bar just off frame (red left, blue right) flashing its double-pulse
+     pattern. One layer washes the scene in coloured light (hard-light keeps the picture under it), the other is the
+     lens: a hot bloom at the source, an anamorphic streak across the frame and a few ghosts. */
+  .lights { inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #wash { mix-blend-mode: hard-light; }
+  #lens { mix-blend-mode: screen; }
+  .flash { inset: 0; pointer-events: none; opacity: 0; mix-blend-mode: screen;
+           background: radial-gradient(75% 90% at 50% 45%, #ffffff 0%, #ffffff 34%, #f6f2ff 52%, #f0dcff 68%, rgba(255, 140, 190, 0.9) 100%),
+                       linear-gradient(90deg, #ff2a4a, #ffffff 30%, #ffffff 70%, #2f6bff); background-blend-mode: multiply; }
+  .flash.run { animation: bloom 0.7s cubic-bezier(0.45, 0, 0.55, 1) forwards; }
+  @keyframes bloom { 0% { opacity: 0; } 45% { opacity: 0.96; } 55% { opacity: 0.96; } 100% { opacity: 0; } }
+
+  /* the source, over the people, bottom centre */
+  .git { left: 50%; bottom: 44px; transform: translateX(-50%); padding: 15px 30px 14px; border: 1.5px solid var(--hot); border-radius: 0; background: transparent;
+         color: var(--hot); font: 700 14px/1 var(--type); letter-spacing: 0.26em; padding-right: calc(30px - 0.26em); text-transform: uppercase; text-decoration: none;
+         transition: background 0.2s, color 0.2s; }
+  .git:hover { background: var(--hot); color: var(--paper); }
+  .git:focus-visible { outline: 2px solid var(--paper); outline-offset: 4px; }
+  /* the author, small, at the foot of the end card's sky; only there */
+  .credit { left: 50%; bottom: 26px; transform: translateX(-50%); color: #ffffff; font: 500 12px/1 var(--type); letter-spacing: 0.26em; padding-left: 0.26em;
+            text-transform: uppercase; text-decoration: none; opacity: 0; visibility: hidden; transition: color 0.2s; }
+  .credit:hover { color: var(--bar); }
+  .credit:focus-visible { outline: 2px solid #ffffff; outline-offset: 4px; }
+
+  /* the finale: the button's red spreads over the whole picture */
+  .fin { left: 0; top: 0; width: 0; height: 0; background: var(--hot); pointer-events: none; visibility: hidden; overflow: hidden; }
+  /* as the red opens up over the picture, it turns into the sunset: magenta above, the hot ink in the middle, amber at the horizon */
+  .fin::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 812px; transform: translateY(-50%); opacity: var(--dusk, 0);
+                background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 52%, var(--sky3) 100%); }
+  /* a colour layout (?pal=1..3): one sky behind everybody instead of the haze of each hour */
+  .pal .fog { background: linear-gradient(180deg, var(--g1) 0%, var(--g2) 55%, var(--g3) 100%); opacity: var(--fogop, 0.88); }
+  .type .end { fill: var(--bar); }
+
+  .type .hot { fill: var(--hot); }
+  /* the scroll cue under the date: shown only while the page waits for the next gesture */
+  .cue { transition: opacity 0.45s; }
+  .cue.off { opacity: 0; }
+  .cue .dot { animation: cue 1.5s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+  @keyframes cue { 0% { transform: translateY(0); opacity: 0; } 25% { opacity: 1; } 75% { opacity: 1; } 100% { transform: translateY(var(--run)); opacity: 0; } }
+
+  /* the preloader: the header's bar, alone in the middle of the black, filling as the footage arrives */
+  .pre { position: absolute; inset: 0; z-index: 20; background: var(--bar); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 34px;
+         transition: opacity 0.7s cubic-bezier(0.45, 0, 0.55, 1); }
+  .pre.out { opacity: 0; pointer-events: none; }
+  .pre p { font: 700 14px/1 var(--type); letter-spacing: 0.18em; padding-left: 0.18em; text-transform: uppercase; color: var(--paper); }
+  .pre p span { color: rgba(243, 234, 217, 0.45); }
+  /* top bar: the title, a segmented progress of the six, the fan-art note */
+  .top { position: absolute; left: 0; right: 0; top: 0; height: 138px; display: flex; align-items: center; justify-content: space-between; padding: 0 128px;
+         font: 700 14px/1 var(--type); letter-spacing: 0.18em; text-transform: uppercase; }
+  .top .title b { color: var(--hot); font-weight: 700; }
+  .progress { position: relative; width: 560px; display: flex; gap: 8px; }
+  .progress i { flex: 1; height: 2px; border-radius: 1px; background: rgba(243, 234, 217, 0.13); position: relative; }
+  .progress i::before, .progress i::after { content: ""; position: absolute; inset: 0; border-radius: 1px; transform-origin: left; }
+  .progress i::before { transform: scaleX(var(--g, 0)); filter: blur(2px);             /* the pre-fill: a warm haze arriving first */
+                        background: linear-gradient(90deg, var(--hot), rgba(243, 234, 217, 0.35)); opacity: 0.5; }
+  .progress i::after { transform: scaleX(var(--f, 0)); background: var(--hot); }
+  .progress .pct { position: absolute; bottom: 12px; transform: translateX(-100%); font: 700 12px/1 var(--type); letter-spacing: 0.06em; color: var(--paper);
+                   font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* foot bar: the billing block of the wait */
+  .foot { position: absolute; left: 0; right: 0; bottom: 0; height: 138px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+          gap: 3px; color: var(--hot); font-family: var(--credit); text-transform: uppercase; text-align: center; }
+  .foot p { display: flex; align-items: baseline; justify-content: center; gap: 0.38em; white-space: nowrap; letter-spacing: -0.01em; }
+  .foot s { text-decoration: none; font-weight: 500; font-size: 9px; letter-spacing: 0.04em; transform: translateY(-1px); }
+  .foot b { font-weight: 700; font-size: 17px; letter-spacing: -0.005em; }
+  .foot p.l1 b { font-size: 20px; }
+  .foot p.l4 { margin-top: 2px; opacity: 0.6; }
+  .foot p.l4 s { font-size: 8.5px; letter-spacing: 0.12em; }
+
+  /* the tall card (a phone held upright): 1080 × 1920, type in a band above the person, everything set ~2× for a phone */
+  .tall .fit { width: 1080px; height: 1920px; }
+  .tall .top { height: 190px; padding: 0 64px; flex-wrap: wrap; align-content: center; row-gap: 54px; font-size: 26px; }
+  .tall .top .progress { order: 3; width: 100%; gap: 12px; }
+  .tall .progress i { height: 4px; }
+  .tall .progress .pct { font-size: 24px; bottom: 16px; }
+  .tall .pic { top: 190px; height: 1430px; }
+  .tall .vi { font-size: 760px; top: 330px; }
+  .tall #person { left: -446px; top: 352px; width: 2000px; height: 1125px; }
+  .tall .glow { background: radial-gradient(60% 40% at 50% 42%, rgba(255, 240, 232, 0.95) 0%, rgba(255, 222, 214, 0.72) 38%, rgba(255, 196, 206, 0.28) 66%, rgba(255, 190, 205, 0) 100%); }
+  .tall .fin::after { height: 1438px; }
+  .tall .git { bottom: 90px; font-size: 28px; padding: 26px 52px 24px; padding-right: calc(52px - 0.26em); border-width: 3px; }
+  .tall .credit { bottom: 44px; font-size: 24px; }
+  .tall .foot { height: 300px; gap: 10px; padding: 0 48px; }
+  .tall .foot p { flex-wrap: wrap; white-space: normal; row-gap: 4px; }
+  .tall .foot s { font-size: 17px; } .tall .foot b { font-size: 30px; } .tall .foot p.l1 b { font-size: 32px; } .tall .foot p.l4 s { font-size: 15px; }
+  .tall .foot p:nth-child(2) { display: none; }          /* the dates line does not fit a phone; the LTX credits line stays */
+  .tall .pre { gap: 60px; } .tall .pre .progress { width: 900px; } .tall .pre p { font-size: 28px; text-align: center; line-height: 1.5; padding: 0 64px; }
+  .tall .pre p span { display: block; }
+
+  @media (prefers-reduced-motion: reduce) { .flash.run, .cue .dot { animation: none; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="fit" id="fit">
+    <div class="pre" id="pre" role="status" aria-live="polite">
+      <div class="progress" id="preBar"><span class="pct" id="prePct">0%</span></div>
+      <p>Loading <span>(it will take less than 13 years)</span></p>
+    </div>
+    <div class="top">
+      <span class="title">The day <b>VI</b></span>
+      <div class="progress" id="progress" role="progressbar" aria-label="Six portraits" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="pct" id="pct">0%</span></div>
+      <span>Fan art &nbsp;·&nbsp; Unofficial</span>
+    </div>
+
+    <div class="pic" id="pic">
+      <div id="bg"></div>
+      <div class="fog"></div>
+      <video class="summer" id="summer" muted playsinline autoplay loop preload="auto" aria-hidden="true"></video>
+      <div class="vi">VI</div>
+      <div class="palms" aria-hidden="true"></div>
+      <div class="glow" aria-hidden="true"></div>
+      <canvas id="person" width="1500" height="844" aria-label="A Miami worker turns their head to the camera, the city running through them"></canvas>
+      <div class="fin" id="fin" aria-hidden="true"></div>
+      <svg class="type" id="type" viewBox="0 0 1920 804" role="img" aria-label="19.11, the day we all been waiting. We're all out of office. Miami, 2026."></svg>
+      <svg class="grain" aria-hidden="true"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+      <canvas class="lights" id="wash" width="960" height="402" aria-hidden="true"></canvas>
+      <canvas class="lights" id="lens" width="960" height="402" aria-hidden="true"></canvas>
+      <div class="flash" id="flash" aria-hidden="true"></div>
+      <a class="git" href="https://github.com/amirmushichge/the-day-vi" target="_blank" rel="noopener">Get on GitHub</a>
+      <a class="credit" id="credit" href="https://x.com/amirmushich" target="_blank" rel="noopener">AmirMushich</a>
+    </div>
+
+    <div class="foot">
+      <p class="l1"><s>The wait began</s><b>December 2023</b><s>first look watched</s><b>frame by frame</b><s>by</s><b>everyone</b><s>since the last one</s><b>thirteen years</b></p>
+      <p><s>first promised</s><b>fall 2025</b><s>then</s><b>May 26, 2026</b><s>then, with an apology</s><b>November 19, 2026</b><s>countdown clocks</s><b>set three times</b></p>
+      <p><s>theories</s><b>one per fan</b><s>leaks</s><b>denied</b><s>sick days</s><b>already booked</b><s>second exposure</s><b>LTX-2.5</b><s>cut by</s><b>LTX Alpha Gen</b></p>
+      <p class="l4"><s>Fan art · unofficial · not connected to the makers of the game · Miami, the day we all been waiting</s></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // the cast; neck: the line (fraction of the frame height) below which the city fills the body
+  // fog: the haze of their hour (centre, middle, edge); place: where and when, under the slogan
+  const CAST = [
+    { key: 'baker', neck: 0.66, dy: 175, fog: ['#e6e7f0', '#d6d9e8', '#c4c9de'], place: 'EVERGLADES, 5:10 AM' },
+    { key: 'pump', neck: 0.66, dy: 95, dx: -66, fog: ['#fbe9dc', '#f5d6c4', '#ecc2ad'], place: 'MIAMI BEACH, 6:30 AM' },
+    { key: 'suit', neck: 0.61, dy: 47, fog: ['#eaf4f2', '#d8ece8', '#c3e0db'], place: 'BISCAYNE BAY, 8:55 AM' },
+    { key: 'barista', neck: 0.73, dy: 100, fog: ['#f7f1e5', '#eee5d2', '#e3d6bf'], place: 'OCEAN DRIVE, 2:15 PM' },
+    { key: 'nurse', neck: 0.74, dy: 95, fog: ['#fde4dc', '#f8cfc4', '#f1b7ab'], place: 'THE KEYS, 7:00 PM' },
+    { key: 'builder', neck: 0.8, dy: 55, fog: ['#ece2ee', '#dccbe0', '#cab3d0'], place: 'DOWNTOWN MIAMI, 11:30 PM' },
+  ];
+  const TURN_FRAMES = 121, FPS = 24, NF = () => { const d = media[current] && media[current].turn.duration; return d ? Math.round(d * FPS) : TURN_FRAMES; },   // frames of this person's turn
+         PUSH = 0.2, CREEP = 0.07, CREEP_MS = 7000;   // the camera pushes in 20 % over the turn, then keeps creeping in
+
+  // ---------- a phone held upright gets its own tall card (1080 × 1920): type above, the person below, bigger type ----------
+  const TALL = innerHeight > innerWidth * 1.05;
+  document.documentElement.classList.toggle('tall', TALL);
+  const PW = TALL ? 1080 : 1920, PH = TALL ? 1430 : 804, FW = TALL ? 1080 : 1920, FH = TALL ? 1920 : 1080;
+  const LITE = TALL || Math.min(screen.width, screen.height) < 820;   // phones and small tablets get the lighter footage
+  const MEDIA = LITE ? 'media/m/' : 'media/';
+  const PK = TALL ? 2000 / 1500 : 1;                     // the person is drawn bigger on the tall card
+  addEventListener('resize', () => { if ((innerHeight > innerWidth * 1.05) !== TALL) location.reload(); });   // turning the phone re-lays the card
+
+  // ---------- colour layouts under review: a muted blue-to-rose sky, an orange VI ----------
+  const PALETTES = {
+    1: { name: 'Dusk', g1: '#8a93c4', g2: '#b59ac4', g3: '#dda8ba', fogop: 0.88, hot: '#ff8a2b', ink: '#15162b', palm: 0.26, sky1: '#5d65a8', sky2: '#c58fb3', sky3: '#ff8a2b' },
+    2: { name: 'Pastel', g1: '#aab6e6', g2: '#ceb5de', g3: '#f1bccb', fogop: 0.9, hot: '#f2741c', ink: '#17182c', palm: 0.3, sky1: '#8f9ad3', sky2: '#e0afc7', sky3: '#f2741c' },
+    3: { name: 'Ocean', g1: '#6d8cc0', g2: '#a49bc8', g3: '#df9fb4', fogop: 0.9, hot: '#ffa23e', ink: '#121527', palm: 0.32, sky1: '#3f5f9e', sky2: '#b88cb8', sky3: '#ffa23e' },
+    4: { name: 'Vice sky', g1: '#7f9df6', g2: '#c28be6', g3: '#ff8fc5', fogop: 0.93, hot: '#ff8a1c', ink: '#1b1442', palm: 0.3, sky1: '#5b7ff0', sky2: '#e57fc9', sky3: '#ff8a1c' },
+    5: { name: 'Pink hour', g1: '#a28cf2', g2: '#ee8ad2', g3: '#ffa4bb', fogop: 0.93, hot: '#ff7d12', ink: '#1b1442', palm: 0.3, sky1: '#7c6cec', sky2: '#f27fc4', sky3: '#ff7d12' },
+    6: { name: 'Lagoon', g1: '#5ea9f6', g2: '#a39cf1', g3: '#ff9dd0', fogop: 0.93, hot: '#ffa01e', ink: '#1b1442', palm: 0.3, sky1: '#3d8ef0', sky2: '#d98ad8', sky3: '#ffa01e' },
+    7: { name: 'Pink hour deep', g1: '#7d5ae4', g2: '#d55cc2', g3: '#f0709e', fogop: 0.96, hot: '#ee6408', ink: '#1b1442', palm: 0.28, sky1: '#6a4be0', sky2: '#e05fb8', sky3: '#ee6408' },
+    8: { name: 'Pink hour night', g1: '#5a46d4', g2: '#b44ab8', g3: '#e45e90', fogop: 0.96, hot: '#f27012', ink: '#1b1442', palm: 0.3, sky1: '#4636c8', sky2: '#c84cae', sky3: '#f27012' },
+    9: { name: 'Pink hour neon', g1: '#8a4ee0', g2: '#e048a8', g3: '#ff5f86', fogop: 0.96, hot: '#e85a00', ink: '#1b1442', palm: 0.28, sky1: '#7440d8', sky2: '#ea4aa2', sky3: '#ff8a1a' },
+  };
+  const QS = new URLSearchParams(location.search), PAL = PALETTES[QS.get('pal') || 7];   // 7, Pink Hour Deep, is the chosen layout
+  if (PAL) {
+    Object.entries(PAL).forEach(([k, v]) => { if (k !== 'name') document.documentElement.style.setProperty(`--${k}`, v); });
+    document.getElementById('pic').classList.add('pal');
+  }
+  if (!QS.has('ink')) QS.set('ink', 'wn');                // chosen: white hero type, no shadow
+  if (QS.get('ink') === 'wn') document.getElementById('pic').classList.add('flat');   // white type, no shadow
+  if (QS.get('ink') === 'w' || QS.get('ink') === 'wn') {                            // white hero type with a hard plum shadow, so it holds on the orange too
+    document.documentElement.style.setProperty('--ink', '#ffffff');
+    document.documentElement.style.setProperty('--track', 'rgba(255, 255, 255, 0.4)');
+    document.getElementById('pic').classList.add('lit');
+  }
+
+  // ---------- media: one packed turn video (person above, matte below) and one city loop per person ----------
+  const media = CAST.map((c) => {
+    const turn = Object.assign(document.createElement('video'), { muted: true, playsInline: true, preload: 'auto' });   // src: set by the preloader
+    const city = Object.assign(document.createElement('video'), { muted: true, playsInline: true, preload: 'auto', loop: true });
+    city.className = 'bgcity';
+    return { turn, city };
+  });
+  const bg = document.getElementById('bg'), pic = document.getElementById('pic');
+
+  // ---------- WebGL: person × matte × city. The city is screened into the darks everywhere (lightly on the face)
+  //            and fills the body below the neck ----------
+  const canvas = document.getElementById('person');
+  const gl = canvas.getContext('webgl', { premultipliedAlpha: true, alpha: true });
+  const vs = 'attribute vec2 p; varying vec2 uv; void main(){ uv = vec2(p.x * 0.5 + 0.5, 0.5 - p.y * 0.5); gl_Position = vec4(p, 0.0, 1.0); }';
+  const fs = `precision mediump float; varying vec2 uv; uniform sampler2D turn; uniform sampler2D city; uniform float neck;
+    void main(){
+      vec3 p = texture2D(turn, vec2(uv.x, uv.y * 0.5)).rgb;
+      float m = texture2D(turn, vec2(uv.x, 0.5 + uv.y * 0.5)).r;
+      float a = clamp((m - 0.1) / 0.8, 0.0, 1.0);
+      vec3 c = texture2D(city, vec2(uv.x, clamp(uv.y - 0.139, 0.0, 1.0))).rgb;
+      float lum = dot(p, vec3(0.3, 0.59, 0.11));
+      float body = smoothstep(neck, neck + 0.22, uv.y);
+      float face = smoothstep(neck - 0.15, neck - 0.03, uv.y);                           // the exposure fades out from the mouth up to the nose
+      float k = clamp(1.25 * pow(1.0 - lum, 1.0), 0.0, 1.0) * face * (0.55 + 0.45 * body);
+      vec3 de = 1.0 - (1.0 - p) * (1.0 - clamp(c * 1.7, 0.0, 1.0) * k);
+      float cl = dot(c, vec3(0.3, 0.59, 0.11));
+      de = mix(de, clamp(c * 1.35, 0.0, 1.0), 0.66 * body * (1.0 - 0.55 * cl));
+      de *= vec3(0.94, 1.0, 1.04);
+      float rim = smoothstep(0.0, 0.5, a) * (1.0 - smoothstep(0.55, 1.0, a));        // the backlight wraps the soft edges: hair goes light, not dark
+      de = mix(de, vec3(1.0, 0.9, 0.9), 0.55 * rim);
+      gl_FragColor = vec4(de * a, a);
+    }`;
+  function shader(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog); gl.useProgram(prog);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  function tex(unit) {
+    const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t);
+    [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T].forEach((w) => gl.texParameteri(gl.TEXTURE_2D, w, gl.CLAMP_TO_EDGE));
+    [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER].forEach((f) => gl.texParameteri(gl.TEXTURE_2D, f, gl.LINEAR));
+    return t;
+  }
+  const tTurn = tex(0), tCity = tex(1);
+  gl.uniform1i(gl.getUniformLocation(prog, 'turn'), 0);
+  gl.uniform1i(gl.getUniformLocation(prog, 'city'), 1);
+  const uNeck = gl.getUniformLocation(prog, 'neck');
+  gl.clearColor(0, 0, 0, 0);
+
+  let current = 0, ready = false, drawn = 0;                      // ready: the new person's video has landed on its first frame
+  function draw() {
+    const { turn, city } = media[current];
+    if (ready && turn.readyState >= 2 && city.readyState >= 2) {
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tTurn);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, turn);
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, tCity);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, city);
+      gl.uniform1f(uNeck, CAST[current].neck);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      drawn++;
+    }
+    requestAnimationFrame(draw);
+  }
+
+  // ---------- the middle axis, laid out by ink edges (as approved on the key frame) ----------
+  const PIC_W = PW, MARGIN = TALL ? 64 : 128, SVG_NS = 'http://www.w3.org/2000/svg';
+  const ctx = document.createElement('canvas').getContext('2d');
+  function ink(text, size, ls) { ctx.font = `700 ${size}px Barlow`; ctx.letterSpacing = `${ls * size}px`; const m = ctx.measureText(text);
+    return { l: -m.actualBoundingBoxLeft, r: m.actualBoundingBoxRight, a: m.actualBoundingBoxAscent, adv: m.width }; }
+  const svg = document.getElementById('type');
+  svg.setAttribute('viewBox', `0 0 ${PW} ${PH}`);
+  // the right block, one slogan per scene (a word between bars, e.g. '|VI|', is set red; not over the red I)
+  const SLOGANS = [
+    ['WE’RE ALL', 'OUT OF', 'OFFICE'],
+    ['EVERYONE', 'INTO', 'GAMING'],
+    ['AND EVEN', 'THOSE WHO', 'AREN’T'],
+    ['WE’VE BEEN', 'WAITING', '13 YEARS'],
+    ['AND NOW', 'THE DAY', 'VI'],
+    ['IS ALMOST', 'HERE.', 'GET READY'],
+  ];
+  const SL = [];
+  let cue = null;
+
+  // every line sits in its own group with its own clip window, so the finale can mask each line on its own
+  const OUT = [], END = [];                              // lines that leave in the finale; the end card
+  let defs = null, clipN = 0;
+  function line(parts, x, baseline, size, ls, list = OUT, cls = '') {
+    const g = document.createElementNS(SVG_NS, 'g'), t = document.createElementNS(SVG_NS, 'text');
+    t.setAttribute('x', x.toFixed(2)); t.setAttribute('y', baseline.toFixed(2)); t.setAttribute('font-size', size.toFixed(2)); t.style.letterSpacing = `${ls}em`;
+    if (cls) t.setAttribute('class', cls);
+    if (size < 40) t.classList.add('sm');
+    parts.forEach(([txt, dx, c]) => { const s = document.createElementNS(SVG_NS, 'tspan'); if (dx) s.setAttribute('dx', (dx * size).toFixed(2)); if (c) s.setAttribute('class', c); s.textContent = txt; t.appendChild(s); });
+    const m = document.createElementNS(SVG_NS, 'g');
+    m.appendChild(t); g.appendChild(m); svg.appendChild(g);
+    if (!defs) { defs = document.createElementNS(SVG_NS, 'defs'); svg.prepend(defs); }
+    const b = t.getBBox(), cp = document.createElementNS(SVG_NS, 'clipPath'), r = document.createElementNS(SVG_NS, 'rect');
+    cp.id = `ln${clipN++}`; cp.setAttribute('clipPathUnits', 'userSpaceOnUse');
+    r.setAttribute('x', (b.x - 40).toFixed(1)); r.setAttribute('width', (b.width + 80).toFixed(1));
+    r.setAttribute('y', b.y.toFixed(1)); r.setAttribute('height', b.height.toFixed(1));
+    cp.appendChild(r); defs.appendChild(cp); g.setAttribute('clip-path', `url(#${cp.id})`);
+    const entry = { g, m, t, r, y: b.y, h: b.height };
+    list.push(entry);
+    return entry;
+  }
+  function setType() {
+    const FS = TALL ? 92 : 104, LS_S = -0.025;
+    const capS = ink('H', FS, LS_S).a, gS = 0.14 * FS, Hs = 3 * capS + 2 * gS, AXIS = TALL ? 72 + Hs / 2 : 402, top = AXIS - Hs / 2;
+    SLOGANS.forEach((rows, k) => {
+      SL[k] = rows.map((row, i) => {
+        const parts = row.split('|').map((w, j) => [w, 0, j % 2 ? 'hot' : '']), txt = row.replace(/\|/g, '');
+        return line(parts, PIC_W - MARGIN - ink(txt, FS, LS_S).r, top + capS + i * (capS + gS), FS, LS_S, k ? [] : OUT);
+      });
+    });
+    const FM = TALL ? 30 : 19, LS_M = TALL ? 0.22 : 0.32, capM = ink('H', FM, LS_M).a, baseM = top + Hs + 34 + capM;
+    CAST.forEach((c, k) => SL[k].push(line([[c.place]], PIC_W - MARGIN - ink(c.place, FM, LS_M).r, baseM, FM, LS_M, k ? [] : OUT)));
+    const cw = ink('SCROLL DOWN', FM, LS_M);
+    cue = line([['SCROLL DOWN']], MARGIN - cw.l, baseM, FM, LS_M);
+    const ix = MARGIN + cw.r - cw.l + 22, iy = baseM - capM - 7, ih = capM + 14;   // a thin track with a red dot running down it
+    cue.m.setAttribute('class', 'cue');
+    const track = document.createElementNS(SVG_NS, 'rect');
+    Object.entries({ x: ix, y: iy, width: 2, height: ih, fill: 'currentColor' }).forEach(([a, v]) => track.setAttribute(a, v));
+    track.style.color = 'var(--track, rgba(19, 25, 27, 0.18))';
+    const dot = document.createElementNS(SVG_NS, 'rect');
+    Object.entries({ x: ix, y: iy, width: 2, height: 8, class: 'dot' }).forEach(([a, v]) => dot.setAttribute(a, v));
+    dot.style.fill = 'var(--hot)'; dot.style.setProperty('--run', `${ih - 8}px`);
+    cue.m.append(track, dot);
+    cue.r.setAttribute('width', (ix + 30 - (+cue.r.getAttribute('x'))).toFixed(1));
+    cue.r.setAttribute('y', (iy - 2).toFixed(1)); cue.r.setAttribute('height', (ih + 4).toFixed(1)); cue.y = iy - 2; cue.h = ih + 4;
+    const LS_D = -0.035, DOT = -0.075, LS_SUB = -0.02, subs = ['THE DAY WE ALL', 'BEEN WAITING'];
+    function measure(FD) {
+      const a = ink('19.', FD, LS_D), b = ink('11', FD, LS_D);
+      const date = { l: a.l, r: a.adv + DOT * FD + b.r, a: Math.max(a.a, b.a) }, w = date.r - date.l;
+      const lines = subs.map((txt) => { const one = ink(txt, 100, LS_SUB); const size = 100 * w / (one.r - one.l); return { txt, size, k: ink(txt, size, LS_SUB) }; });
+      const g = 0.3 * (lines[0].k.a + lines[1].k.a) / 2;
+      return { date, lines, g, h: date.a + g + lines[0].k.a + g + lines[1].k.a };
+    }
+    const FD = 200 * Hs / measure(200).h, m = measure(FD);
+    let base = top + m.date.a;
+    line([['19.'], ['11', DOT]], MARGIN - m.date.l, base, FD, LS_D);
+    m.lines.forEach((ln) => { base += m.g + ln.k.a; line([[ln.txt]], MARGIN - ln.k.l, base, ln.size, LS_SUB); });
+    OUT.sort((p, q) => p.y - q.y);                       // the masks leave row by row, top first
+    OUT.forEach((ln, i) => { ln.rank = i; });
+    SL.slice(1).forEach((set) => set.forEach((ln, j) => { ln.rank = SL[0][j].rank; ln.g.style.visibility = 'hidden'; OUT.push(ln); }));
+    showSlogan(current); setCue();
+
+    // the end card, centred on the picture: 19.11 as wide as the button, the button, two lines under it
+    const bw = git.offsetWidth, bh = git.offsetHeight;
+    const d1 = ink('19.', 100, LS_D), d2 = ink('11', 100, LS_D), dw = d1.adv + DOT * 100 + d2.r - d1.l;
+    const ED = 100 * bw / dw, e1 = ink('19.', ED, LS_D), capD = ink('1', ED, LS_D).a;
+    const FC = TALL ? 30 : 15, LS_C = 0.24, copy = ['THE DAY VI HAS COME', 'ARE YOU READY FOR VI?'], capC = ink('H', FC, LS_C).a, LEAD_C = TALL ? 52 : 27;
+    const G1 = 0.3 * capD, G2 = TALL ? 60 : 34, total = capD + G1 + bh + G2 + capC + LEAD_C;
+    const endTop = PH / 2 - total / 2, CX = PW / 2;
+    const ed = line([['19.'], ['11', DOT]], CX - bw / 2 - e1.l, endTop + capD, ED, LS_D, END, 'end');
+    ed.h = endTop + capD + 1 - ed.y; ed.r.setAttribute('height', ed.h.toFixed(1));   // its window ends on the baseline, clear of the button
+    FIN.btn = { x: CX - bw / 2, y: PH - (TALL ? 90 : 44) - bh, w: bw, h: bh, ty: endTop + capD + G1 };
+    copy.forEach((txt, i) => { const k = ink(txt, FC, LS_C); line([[txt]], CX - (k.l + k.r) / 2, FIN.btn.ty + bh + G2 + capC + i * LEAD_C, FC, LS_C, END, 'end'); });
+    setFinale(FIN.t);
+  }
+
+  // ---------- scenes: the page never scrolls; one wheel notch, swipe or key plays one whole scene on a fixed clock ----------
+  // forward: the person's head turns while the camera pushes in, then the frame holds; the next gesture cuts to the next
+  // person and plays their turn; after the sixth, the GitHub button lights up. Backward: back to the previous person.
+  const flash = document.getElementById('flash'), git = document.querySelector('.git');
+  const progress = document.getElementById('progress'), pct = document.getElementById('pct');
+  const TURN_MS = 2760, LEAD = 0.1;                        // turn length; how far the haze runs ahead of the red, in sections
+  CAST.forEach(() => progress.insertBefore(document.createElement('i'), pct));   // one long section per scene
+  const segs = [...progress.querySelectorAll('i')];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let played = 0, target = 0, shown = 0, seeking = false, lastFrame = -1, busy = false;   // played: 0..1 of the current turn
+  const clamp = (x) => Math.min(1, Math.max(0, x));
+
+  function render() {                                    // bar, percentage and the turn target follow `played`
+    const v = (current + played) / CAST.length;
+    segs.forEach((el, k) => {
+      const f = k < current ? 1 : k > current ? 0 : played;
+      el.style.setProperty('--f', f.toFixed(3));
+      el.style.setProperty('--g', (k === current && played > 0 && played < 1 ? clamp(played + LEAD) : f).toFixed(3));
+    });
+    pct.textContent = `${Math.round(v * 100)}%`;
+    pct.style.left = `${Math.max(4, v * 100)}%`;
+    progress.setAttribute('aria-valuenow', Math.round(v * 100));
+    target = played * (NF() - 1);
+  }
+  const easeInOut = (x) => 0.5 - 0.5 * Math.cos(Math.PI * x);
+  function play(done) {                                  // the whole turn on a fixed clock, eased in and out
+    const t0 = performance.now(), from = played;
+    function step(now) {
+      const x = Math.min(1, (now - t0) / (TURN_MS * (1 - from)));
+      played = from + (1 - from) * easeInOut(x);
+      render();
+      if (x < 1) requestAnimationFrame(step); else if (done) done();
+    }
+    if (reduce) { played = 1; render(); if (done) done(); } else requestAnimationFrame(step);
+  }
+
+  function setPerson(i, at) {                            // a person enters on their own frame: profile forward, the held end going back
+    media[current].city.pause();
+    if (media[current].city.parentNode) media[current].city.remove();
+    current = i; played = at;
+    CAST[i].fog.forEach((c, k) => pic.style.setProperty(`--f${k + 1}`, c));
+    shown = target = at * (NF() - 1); lastFrame = Math.round(shown); seeking = true; ready = false;
+    const t = media[i].turn;
+    t.addEventListener('seeked', () => { seeking = false; ready = true; }, { once: true });
+    t.currentTime = lastFrame / FPS + 0.001;
+    const c = media[i].city;
+    c.currentTime = 0;                                   // the city of their hour starts again with them
+    bg.appendChild(c);
+    c.play().catch(() => {});
+    render();
+  }
+  function whenDrawn(fn) {                               // the new person's turn frame and city are both on the canvas
+    const t0 = performance.now(); let d0 = -1;
+    (function check(now) {
+      const { turn, city } = media[current];
+      if (d0 < 0 && ready && turn.readyState >= 2 && city.readyState >= 2) d0 = drawn;
+      if ((d0 >= 0 && drawn >= d0 + 2) || now - t0 > 2500) fn(); else requestAnimationFrame(check);
+    })(t0);
+  }
+  const BLOOM = 'cubic-bezier(0.45, 0, 0.55, 1)';
+  // ---------- the light bar ----------
+  // Real LED bars flash in short bursts (here a double pulse: two ~45 ms flashes 80 ms apart) and alternate sides;
+  // LEDs switch almost instantly, the camera smears the fall a little. Pulses: [start ms, side 'r' | 'b'].
+  const wash = document.getElementById('wash'), lens = document.getElementById('lens');
+  const LW = PW / 2, LH = PH / 2;
+  [wash, lens].forEach((c) => { c.width = LW; c.height = LH; });
+  const wx = wash.getContext('2d'), lx = lens.getContext('2d');
+  const ON = 45, FALL = 28;
+  const CUT_PULSES = [[0, 'r'], [80, 'r'], [170, 'b'], [250, 'b'], [340, 'r'], [420, 'r'], [470, 'b']];
+  const PASS_PULSES = [[150, 'b'], [230, 'b'], [330, 'r'], [410, 'r']];
+  const SIDE = { r: { x: -0.08, y: 0.36, c: [255, 34, 58], hot: [255, 205, 210] }, b: { x: 1.08, y: 0.36, c: [36, 96, 255], hot: [205, 222, 255] } };
+  function level(pulses, side, t) {                       // light of one side at t: instant on, a short exponential fall
+    let v = 0;
+    for (const [s0, sd] of pulses) {
+      if (sd !== side || t < s0) continue;
+      const d = t - s0;
+      v = Math.max(v, d < ON ? 1 : Math.exp(-(d - ON) / FALL));
+    }
+    return v;
+  }
+  const rgba = (c, a) => `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${Math.max(0, Math.min(1, a)).toFixed(3)})`;
+  function paint(ir, ib, gain) {
+    wx.clearRect(0, 0, LW, LH); lx.clearRect(0, 0, LW, LH);
+    [['r', ir], ['b', ib]].forEach(([k, v]) => {
+      const a = v * gain; if (a < 0.003) return;
+      const S = SIDE[k], sx = S.x * LW, sy = S.y * LH;
+      let g = wx.createRadialGradient(sx, sy, 0, sx, sy, LW * 1.05);            // the wash: coloured light falling across the scene
+      g.addColorStop(0, rgba(S.c, 0.95 * a)); g.addColorStop(0.35, rgba(S.c, 0.6 * a)); g.addColorStop(1, rgba(S.c, 0));
+      wx.fillStyle = g; wx.fillRect(0, 0, LW, LH);
+      g = lx.createRadialGradient(sx, sy, 0, sx, sy, LW * 0.42);               // the bloom at the source: hot core, coloured halo
+      g.addColorStop(0, rgba([255, 255, 255], a)); g.addColorStop(0.18, rgba(S.hot, 0.9 * a)); g.addColorStop(0.5, rgba(S.c, 0.45 * a)); g.addColorStop(1, rgba(S.c, 0));
+      lx.fillStyle = g; lx.fillRect(0, 0, LW, LH);
+      lx.save(); lx.translate(sx, sy); lx.scale(1, 0.035);                       // the anamorphic streak across the frame
+      g = lx.createRadialGradient(0, 0, 0, 0, 0, LW * 1.15);
+      g.addColorStop(0, rgba([255, 255, 255], 0.95 * a)); g.addColorStop(0.25, rgba(S.hot, 0.7 * a)); g.addColorStop(0.7, rgba(S.c, 0.25 * a)); g.addColorStop(1, rgba(S.c, 0));
+      lx.fillStyle = g; lx.beginPath(); lx.arc(0, 0, LW * 1.15, 0, Math.PI * 2); lx.fill(); lx.restore();
+      [[0.62, 0.05, 0.22], [0.9, 0.028, 0.3], [1.25, 0.08, 0.12]].forEach(([d, r, o]) => {   // lens ghosts on the line through the centre
+        const gx = sx + (LW / 2 - sx) * d * 2, gy = sy + (LH / 2 - sy) * d * 2, R = r * LW;
+        const h = lx.createRadialGradient(gx, gy, R * 0.2, gx, gy, R);
+        h.addColorStop(0, rgba(S.hot, o * a * 0.5)); h.addColorStop(0.8, rgba(S.c, o * a)); h.addColorStop(1, rgba(S.c, 0));
+        lx.fillStyle = h; lx.beginPath(); lx.arc(gx, gy, R, 0, Math.PI * 2); lx.fill();
+      });
+    });
+  }
+  let lightsId = 0;
+  function lights(pulses, gain, doneAt, done) {           // run a pattern; `done` fires at doneAt ms, the lights finish on their own
+    const id = ++lightsId, t0 = performance.now(), end = pulses[pulses.length - 1][0] + ON + FALL * 5;
+    let fired = false;
+    (function tick(now) {
+      if (id !== lightsId) return;
+      const t = now - t0;
+      paint(level(pulses, 'r', t), level(pulses, 'b', t), gain);
+      if (!fired && done && t >= doneAt) { fired = true; done(); }
+      if (t < end) requestAnimationFrame(tick); else paint(0, 0, 0);
+    })(t0);
+  }
+  function cut(i, at, then) {                            // police lights; the swap waits under the white flare
+    if (heroLoaded && heroLoaded[i] && heroLoaded[i].left > 0) { heroLoaded[i].p.then(() => cut(i, at, then)); return; }   // that scene is still loading
+    swapSlogan(i, i >= current ? 1 : -1);
+    if (reduce) { setPerson(i, at); if (then) then(); return; }
+    lights(CUT_PULSES, 1, 470, () => {
+      void getComputedStyle(flash).opacity;             // settle the start value, so the flare always transitions
+      flash.style.transition = `opacity 0.16s ${BLOOM}`; flash.style.opacity = '1';
+      flare(i, at, then);
+    });
+  }
+  function flare(i, at, then) {
+    const t0 = performance.now();
+    (function peak(now) {                                // swap only once the bloom really covers the picture
+      if (+getComputedStyle(flash).opacity < 0.97 && now - t0 < 1200) { requestAnimationFrame(peak); return; }
+      setPerson(i, at);
+      whenDrawn(() => setTimeout(() => {
+        flash.style.transition = `opacity 0.42s ${BLOOM}`; flash.style.opacity = '0';
+        lights(PASS_PULSES, 0.55);                                           // the car passes: the lights sweep once more as the picture returns
+        if (then) setTimeout(then, 180);
+      }, 50));
+    })(t0);
+  }
+
+  // ---------- the right block tells the story, one slogan per scene; each line swaps through its own mask ----------
+  let sloganOn = 0, swapId = 0;
+  function showSlogan(k) {
+    sloganOn = k;
+    SL.forEach((set, j) => set.forEach((ln) => { ln.g.style.visibility = j === k ? '' : 'hidden'; ln.t.removeAttribute('transform'); }));
+  }
+  function swapSlogan(k, dir) {                          // forward: old lines leave up, new rise from below; back: the other way
+    if (k === sloganOn || !SL[k]) return;
+    const A = SL[sloganOn], B = SL[k], id = ++swapId, t0 = performance.now();
+    SL.forEach((set, j) => { if (set !== A && set !== B) set.forEach((ln) => { ln.g.style.visibility = 'hidden'; }); });
+    sloganOn = k;
+    if (reduce) { showSlogan(k); return; }
+    B.forEach((ln) => { ln.g.style.visibility = ''; ln.t.setAttribute('transform', `translate(0 ${(dir * ln.h).toFixed(2)})`); });
+    const order = (j) => (dir > 0 ? j : A.length - 1 - j);
+    (function step(now) {
+      if (id !== swapId) return;
+      const t = now - t0;
+      A.forEach((ln, j) => { const s = order(j) * 60, p = io(seg(t, s, s + 430)); ln.t.setAttribute('transform', `translate(0 ${(-dir * ln.h * p).toFixed(2)})`); });
+      B.forEach((ln, j) => { const s = 420 + order(j) * 80, p = outC(seg(t, s, s + 620)); ln.t.setAttribute('transform', `translate(0 ${(dir * ln.h * (1 - p)).toFixed(2)})`); });
+      if (t < 1240) requestAnimationFrame(step); else A.forEach((ln) => { ln.g.style.visibility = 'hidden'; ln.t.removeAttribute('transform'); });
+    })(t0);
+  }
+
+  // the scroll cue shows only while the page waits for a gesture
+  function setCue() { if (cue) cue.m.classList.toggle('off', busy || FIN.goal > 0); }
+
+  // ---------- the finale: a pure function of its own clock t (ms), so it plays back exactly in reverse ----------
+  // the button fills red; the red stretches on X to the frame edges, then on Y over the whole picture while the button
+  // rides it to the centre and turns black with red type; every line of type leaves through its own mask going up;
+  // 19.11 rises above the button, two lines float in under it
+  const fin = document.getElementById('fin'), credit = document.getElementById('credit');
+  const FIN = { t: 0, goal: 0, raf: 0, done: null, btn: null, LEN: 2750 };
+  const seg = (t, a, b) => clamp((t - a) / (b - a));
+  const io = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+  const outC = (x) => 1 - Math.pow(1 - x, 3);
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const hex = (v) => { const h = v.trim().replace('#', ''); return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)); };
+  const HOT = PAL ? hex(PAL.hot) : [255, 59, 92];
+  const PAPER = [243, 234, 217], BAR = [11, 12, 13];
+  const rgb = (a, b, k) => `rgb(${a.map((v, i) => Math.round(lerp(v, b[i], k))).join(',')})`;
+  function setFinale(t) {
+    FIN.t = t;
+    const B = FIN.btn; if (!B) return;
+    const on = t > 0;
+    fin.style.visibility = on ? 'visible' : 'hidden';
+    git.style.transition = on ? 'none' : '';
+    if (!on) { ['background', 'color', 'borderColor', 'transform'].forEach((p) => { git.style[p] = ''; }); }
+    const fill = io(seg(t, 0, 320)), sx = io(seg(t, 260, 940)), sy = io(seg(t, 880, 1700)), dark = io(seg(t, 1250, 1700));
+    fin.style.left = `${lerp(B.x, -4, sx)}px`; fin.style.width = `${lerp(B.w, PW + 8, sx)}px`;     // bleeds past the edges: no hairline
+    fin.style.top = `${lerp(B.y, -4, sy)}px`; fin.style.height = `${lerp(B.h, PH + 8, sy)}px`;
+    canvas.style.visibility = sy >= 1 ? 'hidden' : '';
+    fin.style.setProperty('--dusk', io(seg(t, 1000, 1900)).toFixed(3));  // once the red covers everything, nothing may peek at the edges
+    if (on) {
+      git.style.transform = `translate(-50%, ${((B.ty - B.y) * sy).toFixed(2)}px)`;
+      git.style.background = dark > 0 ? rgb(HOT, BAR, dark) : `rgba(${HOT.join(',')}, ${fill.toFixed(3)})`;
+      git.style.color = dark > 0 ? rgb(PAPER, HOT, dark) : rgb(HOT, PAPER, fill);
+      git.style.borderColor = rgb(HOT, BAR, dark);
+    }
+    OUT.forEach((ln, i) => {                             // the mask slides up off its line; the line drifts up a little after it
+      const s = 1050 + ln.rank * 75, p = io(seg(t, s, s + 700));
+      ln.r.setAttribute('y', (ln.y - 1.35 * ln.h * p).toFixed(2));
+      ln.m.setAttribute('transform', `translate(0 ${(-0.3 * ln.h * p).toFixed(2)})`);
+    });
+    const cr = outC(seg(t, 2150, 2750));               // the author fades in last, at the foot of the sky
+    credit.style.opacity = cr.toFixed(3); credit.style.visibility = cr > 0 ? 'visible' : 'hidden';
+    END.forEach((ln, i) => {
+      if (i === 0) {                                     // 19.11 rises into its own window
+        const p = outC(seg(t, 1650, 2400));
+        ln.t.setAttribute('transform', `translate(0 ${(ln.h * (1 - p)).toFixed(2)})`);
+      } else {                                           // the two lines float in
+        const s = 2000 + (i - 1) * 140, p = outC(seg(t, s, s + 600));
+        ln.t.setAttribute('transform', `translate(0 ${(12 * (1 - p)).toFixed(2)})`);
+        ln.t.style.opacity = p.toFixed(3);
+      }
+    });
+  }
+  function finale(goal, done) {                          // run the finale clock forward (goal LEN) or back (goal 0)
+    FIN.goal = goal; FIN.done = done;
+    if (reduce) { setFinale(goal); if (done) done(); return; }
+    if (FIN.raf) return;
+    let last = performance.now();
+    const step = (now) => {
+      const dt = Math.min(50, now - last); last = now;
+      setFinale(FIN.goal > FIN.t ? Math.min(FIN.goal, FIN.t + dt) : Math.max(FIN.goal, FIN.t - dt * 1.5));
+      if (FIN.t !== FIN.goal) FIN.raf = requestAnimationFrame(step);
+      else { FIN.raf = 0; if (FIN.done) FIN.done(); }
+    };
+    FIN.raf = requestAnimationFrame(step);
+  }
+
+  // forward: turn the person to the camera; then cut to the next one, who waits in profile for the next gesture;
+  // after the sixth, the finale. Backward: undo the finale, or cut back to the previous person in profile.
+  const release = () => setTimeout(() => { busy = false; setCue(); }, 250);
+  function next() {
+    if (FIN.goal > 0) return;
+    if (played < 1) { busy = true; play(release); return; }
+    if (current < CAST.length - 1) { busy = true; cut(current + 1, 0, release); return; }
+    busy = true; finale(FIN.LEN, release);
+  }
+  function prev() {
+    if (FIN.goal > 0 || FIN.t > 0) { busy = true; finale(0, release); return; }
+    if (current > 0) { busy = true; cut(current - 1, 0, release); return; }
+    if (played > 0) { busy = true; cut(0, 0, release); }
+  }
+  function gesture(dir) { if (busy) return; if (dir > 0) next(); else prev(); setCue(); }
+
+  let acc = 0, quietTimer = null;
+  addEventListener('wheel', (e) => {
+    e.preventDefault();
+    acc += e.deltaY;
+    clearTimeout(quietTimer); quietTimer = setTimeout(() => { acc = 0; }, 180);   // a trackpad's tail does not count twice
+    if (Math.abs(acc) > 40) { gesture(Math.sign(acc)); acc = 0; }
+  }, { passive: false });
+  let touchY = null;
+  addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+  addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+  addEventListener('touchend', (e) => { if (touchY == null) return; const d = touchY - e.changedTouches[0].clientY; if (Math.abs(d) > 30) gesture(Math.sign(d)); touchY = null; });
+  addEventListener('keydown', (e) => {
+    const dir = { ArrowDown: 1, ArrowRight: 1, PageDown: 1, ' ': 1, Enter: 1, ArrowUp: -1, ArrowLeft: -1, PageUp: -1 }[e.key];
+    if (dir) { e.preventDefault(); gesture(dir); }
+  });
+
+  // the shown frame eases toward the target, one seek at a time; the camera pushes in with the turn
+  let turnedAt = 0;
+  media.forEach(({ turn }) => turn.addEventListener('seeked', () => { if (ready) seeking = false; }));
+  function ease() {
+    if (ready) {
+      shown += (target - shown) * 0.3;
+      if (Math.abs(target - shown) < 0.05) shown = target;
+      const f = Math.round(shown), t = media[current].turn;
+      if (!seeking && f !== lastFrame && t.readyState >= 1) { seeking = true; lastFrame = f; t.currentTime = f / FPS + 0.001; }
+      const done = shown >= NF() - 1.5, now = performance.now();
+      if (done && !turnedAt) turnedAt = now; else if (!done) turnedAt = 0;
+      const creep = turnedAt ? CREEP * (1 - Math.exp(-(now - turnedAt) / CREEP_MS)) : 0;   // after the turn the camera keeps drifting in
+      const c = CAST[current];
+      canvas.style.transform = `translate(${(c.dx || 0) * PK}px, ${(c.dy || 0) * PK}px) scale(${(1 + PUSH * shown / (NF() - 1) + creep).toFixed(4)})`;   // dx/dy: per person framing
+    }
+    requestAnimationFrame(ease);
+  }
+
+  const fit = document.getElementById('fit');
+  function scale() {
+    const s = Math.min(innerWidth / FW, innerHeight / FH);
+    fit.style.transform = `scale(${s})`;
+    fit.style.margin = `${(FH * s - FH) / 2}px ${(FW * s - FW) / 2}px`;
+  }
+  addEventListener('resize', scale);
+  scale();
+  Promise.all([document.fonts.load('700 100px Barlow'), document.fonts.load('900 100px Archivo')]).then(setType);
+
+  // review stills: ?hero=0..5&frame=0..120 freezes a person mid-turn; add &cut=0..0.7 to freeze the bloom
+  const q = new URLSearchParams(location.search);
+  if (q.has('sumb')) document.documentElement.style.setProperty('--sumb', q.get('sumb'));
+  if (q.has('sumo')) document.documentElement.style.setProperty('--sumo', q.get('sumo'));
+  function boot() {
+  if (q.has('hero')) {
+    const i = +q.get('hero'), f = +(q.get('frame') || 0);
+    setPerson(i, f / (TURN_FRAMES - 1)); busy = true;
+    if (q.has('fin')) { FIN.t = FIN.goal = +q.get('fin'); setFinale(FIN.t); }   // &fin=0..2750 freezes the finale at that ms
+    if (q.has('cut')) { flash.classList.add('run'); flash.style.animationDelay = `-${+q.get('cut')}s`; flash.style.animationPlayState = 'paused'; }
+  } else {
+    const start = () => setPerson(0, 0);
+    media[0].turn.readyState >= 1 ? start() : media[0].turn.addEventListener('loadedmetadata', start, { once: true });
+  }
+  }
+
+  // ---------- preloader: every file is fetched whole (so turns scrub without waiting), the bar shows real bytes ----------
+  const pre = document.getElementById('pre'), preBar = document.getElementById('preBar'), prePct = document.getElementById('prePct');
+  CAST.forEach(() => preBar.insertBefore(document.createElement('i'), prePct));
+  const preSegs = [...preBar.querySelectorAll('i')];
+  let shownPct = 0, goalPct = 0;
+  (function bar() {                                      // the shown value eases toward the real one, so the bar runs, never jumps
+    shownPct += (goalPct - shownPct) * 0.12;
+    if (goalPct - shownPct < 0.001) shownPct = goalPct;
+    const v = shownPct * CAST.length;
+    preSegs.forEach((el, k) => { const f = clamp(v - k); el.style.setProperty('--f', f.toFixed(3)); el.style.setProperty('--g', clamp(v - k + LEAD * 3).toFixed(3)); });
+    prePct.textContent = `${Math.floor(shownPct * 100)}%`;
+    prePct.style.left = `${Math.max(4, shownPct * 100)}%`;
+    if (!pre.classList.contains('out')) requestAnimationFrame(bar);
+  })();
+  const summer = document.getElementById('summer');
+  // the first scene and the backdrop gate the start; the other five load in order behind it while people watch
+  const FILES = [['media/palms.jpg', null, -1], [`${MEDIA}city-pump.mp4`, summer, -1]];
+  CAST.forEach((c, i) => FILES.push([`${MEDIA}turn-${c.key}.mp4`, media[i].turn, i], [`${MEDIA}city-${c.key}.mp4`, media[i].city, i]));
+  const GATE = q.has('hero') ? FILES.length : 4;       // review stills wait for everything
+  const heroLoaded = CAST.map((_, i) => { let ok; const p = new Promise((r) => { ok = r; }); return { p, ok, left: 2 }; });
+  const SIZE_GUESS = 4.5e6;                              // per file, until the server tells the real size
+  const got = FILES.map(() => 0), size = FILES.map(() => SIZE_GUESS);
+  const sum = (a) => a.slice(0, GATE).reduce((x, y) => x + y, 0);
+  const progress_ = () => { goalPct = Math.min(0.999, sum(got) / sum(size)); };
+  async function fetchFile(k) {
+    const [url, el, hero] = FILES[k];
+    try {
+      const res = await fetch(url);
+      if (!res.ok || !res.body) throw new Error(res.status);
+      const len = +res.headers.get('content-length'); if (len) size[k] = len;
+      const reader = res.body.getReader(), parts = [];
+      for (;;) { const { done, value } = await reader.read(); if (done) break; parts.push(value); got[k] += value.length; progress_(); }
+      size[k] = got[k]; progress_();
+      if (el) el.src = URL.createObjectURL(new Blob(parts, { type: url.endsWith('.mp4') ? 'video/mp4' : 'image/jpeg' }));
+    } catch (e) {                                        // no streaming (or a file:// page): let the element load it the usual way
+      got[k] = size[k]; progress_();
+      if (el) el.src = url;
+    }
+    if (hero >= 0 && --heroLoaded[hero].left === 0) heroLoaded[hero].ok();
+  }
+  let nextFile = 0;
+  const worker = async (limit) => { while (nextFile < limit()) await fetchFile(nextFile++); };
+  let gateOpen = false;
+  busy = true;
+  const firstPart = Promise.all([0, 1, 2, 3].map(() => worker(() => (gateOpen ? FILES.length : GATE))));
+  firstPart.then(() => { gateOpen = true; [0, 1, 2].forEach(() => worker(() => FILES.length)); });   // then the rest, in scene order
+  Promise.all([firstPart, document.fonts.ready]).then(() => {
+    summer.play().catch(() => {});
+    goalPct = 1;
+    boot();
+    setTimeout(() => { pre.classList.add('out'); if (!q.has('hero')) { busy = false; setCue(); } }, 450);
+    setTimeout(() => pre.remove(), 1300);
+  });
+  requestAnimationFrame(draw); requestAnimationFrame(ease);
+</script>
+</body>
+</html>
