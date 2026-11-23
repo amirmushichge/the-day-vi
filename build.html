@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Build-up</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400&display=swap" rel="stylesheet">
+<style>
+  /* the six scenes assembling at once, for the tutorial thread: white page, Manrope -0.04em, one caption per phase */
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 1920px; height: 1080px; background: #fff; overflow: hidden; font-family: Manrope, Arial, sans-serif; }
+  .cap { position: absolute; left: 0; right: 0; top: 64px; height: 72px; }
+  .cap span { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 44px; line-height: 72px; letter-spacing: -0.04em; color: #000; opacity: 0; transition: opacity 0.45s; }
+  .cap span.on { opacity: 1; }
+  .step { position: absolute; left: 0; right: 0; top: 150px; text-align: center; font-size: 22px; letter-spacing: -0.04em; color: #6f6f6f; font-variant-numeric: tabular-nums; }
+  .grid { position: absolute; left: 0; top: 220px; width: 1920px; height: 720px; display: grid; grid-template-columns: repeat(3, 640px); grid-template-rows: repeat(2, 360px); }
+  iframe { width: 640px; height: 360px; border: 0; display: block; background: #000; }
+</style></head><body>
+<div class="cap" id="cap">
+  <span>LTX-2.5 flyovers</span><span>LTX Alpha Gen cut-outs on top</span><span>Double exposure inside the silhouette</span><span>Background: haze, beach, VI, palms, light</span><span>The site</span>
+</div>
+<div class="step" id="step"></div>
+<div class="grid" id="grid"></div>
+<script>
+  const grid = document.getElementById('grid'), caps = [...document.querySelectorAll('#cap span')], step = document.getElementById('step');
+  const frames = [0, 1, 2, 3, 4, 5].map((i) => { const f = document.createElement('iframe'); f.src = `index.html?hero=${i}&frame=0&build`; grid.appendChild(f); return f; });
+  window.__ready = 0;
+  addEventListener('message', (e) => { if (e.data && 'ready' in e.data) window.__ready++; });
+  const PHASES = [0, 1000, 2500, 4000, 5500];
+  function show(k) { caps.forEach((c, i) => c.classList.toggle('on', i === k)); step.textContent = `${k + 1}/${PHASES.length}`; }
+  show(0);
+  window.goAll = () => {                                      // one start for all six, the captions on the same clock
+    frames.forEach((f) => f.contentWindow.postMessage('go', '*'));
+    PHASES.forEach((t, k) => setTimeout(() => show(k), t));
+  };
+</script>
+</body></html>

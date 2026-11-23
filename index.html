@@ -255,7 +255,7 @@
   const canvas = document.getElementById('person');
   const gl = canvas.getContext('webgl', { premultipliedAlpha: true, alpha: true });
   const vs = 'attribute vec2 p; varying vec2 uv; void main(){ uv = vec2(p.x * 0.5 + 0.5, 0.5 - p.y * 0.5); gl_Position = vec4(p, 0.0, 1.0); }';
-  const fs = `precision mediump float; varying vec2 uv; uniform sampler2D turn; uniform sampler2D city; uniform float neck;
+  const fs = `precision mediump float; varying vec2 uv; uniform sampler2D turn; uniform sampler2D city; uniform float neck; uniform float expo;
     void main(){
       vec3 p = texture2D(turn, vec2(uv.x, uv.y * 0.5)).rgb;
       float m = texture2D(turn, vec2(uv.x, 0.5 + uv.y * 0.5)).r;
@@ -271,6 +271,7 @@
       de *= vec3(0.94, 1.0, 1.04);
       float rim = smoothstep(0.0, 0.5, a) * (1.0 - smoothstep(0.55, 1.0, a));        // the backlight wraps the soft edges: hair goes light, not dark
       de = mix(de, vec3(1.0, 0.9, 0.9), 0.55 * rim);
+      de = mix(p, de, expo);                                                            // expo 0: the plain cut-out (the build-up reel)
       gl_FragColor = vec4(de * a, a);
     }`;
   function shader(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
@@ -289,7 +290,8 @@
   const tTurn = tex(0), tCity = tex(1);
   gl.uniform1i(gl.getUniformLocation(prog, 'turn'), 0);
   gl.uniform1i(gl.getUniformLocation(prog, 'city'), 1);
-  const uNeck = gl.getUniformLocation(prog, 'neck');
+  const uNeck = gl.getUniformLocation(prog, 'neck'), uExpo = gl.getUniformLocation(prog, 'expo');
+  let EXPO = 1;                                            // how much of the double exposure is shown (1 on the site)
   gl.clearColor(0, 0, 0, 0);
 
   let current = 0, ready = false, drawn = 0;                      // ready: the new person's video has landed on its first frame
@@ -300,7 +302,7 @@
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, turn);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, tCity);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, city);
-      gl.uniform1f(uNeck, CAST[current].neck);
+      gl.uniform1f(uNeck, CAST[current].neck); gl.uniform1f(uExpo, EXPO);
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -666,7 +668,7 @@
   });
 
   // the shown frame eases toward the target, one seek at a time; the camera pushes in with the turn
-  let turnedAt = 0;
+  let turnedAt = 0, personZ = 0;
   media.forEach(({ turn }) => turn.addEventListener('seeked', () => { if (ready) seeking = false; }));
   function ease() {
     if (ready) {
@@ -678,18 +680,114 @@
       if (done && !turnedAt) turnedAt = now; else if (!done) turnedAt = 0;
       const creep = turnedAt ? CREEP * (1 - Math.exp(-(now - turnedAt) / CREEP_MS)) : 0;   // after the turn the camera keeps drifting in
       const c = CAST[current];
-      canvas.style.transform = `translate(${(c.dx || 0) * PK}px, ${(c.dy || 0) * PK}px) scale(${(1 + PUSH * shown / (NF() - 1) + creep).toFixed(4)})`;   // dx/dy: per person framing
+      canvas.style.transform = `translate(${(c.dx || 0) * PK}px, ${(c.dy || 0) * PK}px) scale(${(1 + PUSH * shown / (NF() - 1) + creep).toFixed(4)})${personZ ? ` translateZ(${personZ.toFixed(2)}px)` : ''}`;   // dx/dy: per person framing; personZ: the layer breakdown
     }
     requestAnimationFrame(ease);
   }
 
   const fit = document.getElementById('fit');
+  let fitScale = 1, explodeCam = '';                       // explodeCam: the 3D camera of the layer breakdown, empty at rest
   function scale() {
     const s = Math.min(innerWidth / FW, innerHeight / FH);
-    fit.style.transform = `scale(${s})`;
+    fitScale = s;
+    fit.style.transform = `scale(${s})${explodeCam}`;
     fit.style.margin = `${(FH * s - FH) / 2}px ${(FW * s - FW) / 2}px`;
   }
   addEventListener('resize', scale);
+
+  // ---------- build-up (recorded for the tutorial, not part of the page's UX): ?hero=N&build shows how the card is made.
+  // Flyover alone → the LTX Alpha Gen cut-out fades in over it → the double exposure grows inside the silhouette → the
+  // background settles (haze, beach, VI, palms, light) → the type, bars and button. In a frame, it waits for 'go'.
+  function buildUp() {
+    const pic = document.getElementById('pic'), cityEl = () => media[current].city;
+    const groups = {
+      bg: ['.fog', '.summer', '.vi', '.palms', '.glow'], site: ['.type', '.git', '.top', '.foot', '.grain'],
+    };
+    const base = new Map();
+    const all = [...groups.bg, ...groups.site].map((sel) => document.querySelector(sel)).filter(Boolean);
+    all.forEach((el) => { base.set(el, +getComputedStyle(el).opacity || 0); el.style.opacity = '0'; });
+    canvas.style.opacity = '0'; EXPO = 0;
+    if (document.fonts.status === 'loaded' && SL[current]) showSlogan(current); else document.fonts.ready.then(() => setTimeout(() => showSlogan(current), 300));   // each scene's own lines
+    const setCity = (k) => { const c = cityEl(); if (c) c.style.filter = `blur(${(7 * k).toFixed(2)}px) saturate(${(1 - 0.3 * k).toFixed(3)})`; };
+    setCity(0); pic.style.background = '#000';
+    const io = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+    const seg = (t, a, b) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+    const go = () => {
+      const t0 = performance.now(); let turned = false;
+      (function step(now) {
+        const t = now - t0;
+        if (!turned && t > 1000) { turned = true; play(); }                       // the head starts to turn as the person appears
+        canvas.style.opacity = io(seg(t, 1000, 2000)).toFixed(3);
+        EXPO = io(seg(t, 2500, 3800));
+        const bg = io(seg(t, 4000, 5300)), site = io(seg(t, 5500, 6700));
+        setCity(bg);
+        groups.bg.forEach((sel) => { const el = document.querySelector(sel); if (el) el.style.opacity = (base.get(el) * bg).toFixed(3); });
+        groups.site.forEach((sel) => { const el = document.querySelector(sel); if (el) el.style.opacity = (base.get(el) * site).toFixed(3); });
+        if (t < 7000) requestAnimationFrame(step);
+      })(t0);
+    };
+    if (window.parent !== window) { addEventListener('message', (e) => { if (e.data === 'go') go(); }); parent.postMessage({ ready: +q.get('hero') }, '*'); }
+    else setTimeout(go, 800);
+  }
+
+  // ---------- layer breakdown (recorded for the showreel, not part of the page's UX): the card tips into isometry, every
+  // layer of the picture lifts off along the depth axis like a burger, holds while everything keeps playing, then
+  // stacks back and the camera returns to the front. explodeLayers(ms) resolves when it is back.
+  const LAYERS = [                                         // [selector, depth in px]: back to front
+    ['#bg', -420], ['.fog', -330], ['.summer', -250], ['.vi', -170], ['.palms', -95], ['.glow', -30],
+    ['#person', 70], ['.type', 190], ['.git', 270], ['.credit', 270],
+  ];
+  window.explodeLayers = (ms = 4400) => new Promise((done) => {
+    const pic = document.getElementById('pic'), stage = document.querySelector('.stage');
+    const els = LAYERS.map(([sel, z]) => [document.querySelector(sel), z]).filter(([el]) => el);
+    const base = new Map(els.map(([el]) => [el, el.style.transform]));
+    // each layer keeps only the part inside the picture, so the planes read as cards of one size
+    const picBox = { w: pic.offsetWidth, h: pic.offsetHeight };
+    els.forEach(([el]) => {
+      if (el === canvas || el.classList.contains('git') || el.classList.contains('credit') || el.classList.contains('type')) return;
+      const t = -el.offsetTop, l = -el.offsetLeft, b = el.offsetTop + el.offsetHeight - picBox.h, r = el.offsetLeft + el.offsetWidth - picBox.w;
+      el.style.clipPath = `inset(${Math.max(0, t)}px ${Math.max(0, r)}px ${Math.max(0, b)}px ${Math.max(0, l)}px)`;
+    });
+    const before = { stage: stage.style.perspective, pic: pic.style.cssText };
+    // blend modes would flatten the 3D stack into one plane: for the breakdown every layer draws normally, each
+    // looking as close as it can to what it adds to the picture (the palm shadow becomes dark leaves on a mask)
+    const blended = [...pic.children].filter((el) => getComputedStyle(el).mixBlendMode !== 'normal').map((el) => [el, el.style.cssText]);
+    blended.forEach(([el]) => {
+      el.style.mixBlendMode = 'normal';
+      if (el.classList.contains('summer')) el.style.opacity = '0.32';
+      if (el.classList.contains('palms')) { el.style.background = 'rgb(46, 16, 92)'; el.style.webkitMaskImage = el.style.maskImage = 'url(media/palms-alpha.png)';
+                                            el.style.webkitMaskSize = el.style.maskSize = 'cover'; el.style.webkitMaskPosition = el.style.maskPosition = 'center'; el.style.opacity = '0.34'; }
+      if (el.classList.contains('glow')) el.style.opacity = '0.6';
+      if (el.classList.contains('grain') || el.classList.contains('lights') || el.classList.contains('flash')) el.style.visibility = 'hidden';
+    });
+    stage.style.perspective = '5200px';
+    fit.style.transformStyle = 'preserve-3d';
+    pic.style.overflow = 'visible'; pic.style.transformStyle = 'preserve-3d'; pic.style.background = 'transparent';
+    const io = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+    const seg = (t, a, b) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+    const t0 = performance.now();
+    (function step(now) {
+      const t = (now - t0) / ms;
+      const cam = io(seg(t, 0, 0.24)) * (1 - io(seg(t, 0.78, 1)));          // tip into isometry, then back to the front
+      const lift = io(seg(t, 0.12, 0.38)) * (1 - io(seg(t, 0.62, 0.86)));    // layers fly apart, then stack back
+      const drift = Math.sin(seg(t, 0.2, 0.8) * Math.PI) * 6;                 // a slow orbit while it holds
+      explodeCam = cam ? ` translateY(${(-150 * cam).toFixed(2)}px) rotateX(${(54 * cam).toFixed(3)}deg) rotateZ(${(-(38 + drift) * cam).toFixed(3)}deg) scale(${(1 - 0.44 * cam).toFixed(4)})` : '';
+      fit.style.transform = `scale(${fitScale})${explodeCam}`;
+      els.forEach(([el, z]) => { el.style.translate = `0 0 ${(z * lift).toFixed(2)}px`; });   // the individual translate composes with each layer's own transform and animation
+      {                                                    // the person is drawn bigger than the picture (push-in, framing): keep only what falls inside it
+        const m = /scale\(([\d.]+)\)/.exec(canvas.style.transform), k = m ? +m[1] : 1, c = CAST[current], dy = (c.dy || 0) * PK;
+        const T = canvas.offsetTop, H = canvas.offsetHeight, oy = 0.46 * H;
+        const yt = (0 - T - dy - oy) / k + oy, yb = (picBox.h - T - dy - oy) / k + oy;
+        canvas.style.clipPath = `inset(${Math.max(0, yt).toFixed(1)}px 0 ${Math.max(0, H - yb).toFixed(1)}px 0)`;
+      }
+      if (t < 1) { requestAnimationFrame(step); return; }
+      explodeCam = ''; scale();
+      els.forEach(([el]) => { el.style.translate = ''; el.style.clipPath = ''; });
+      stage.style.perspective = before.stage; fit.style.transformStyle = ''; pic.style.cssText = before.pic;
+      blended.forEach(([el, css]) => { el.style.cssText = css; });
+      done();
+    })(t0);
+  });
   scale();
   Promise.all([document.fonts.load('700 100px Barlow'), document.fonts.load('900 100px Archivo')]).then(setType);
 
@@ -702,6 +800,7 @@
     const i = +q.get('hero'), f = +(q.get('frame') || 0);
     setPerson(i, f / (TURN_FRAMES - 1)); busy = true;
     if (q.has('fin')) { FIN.t = FIN.goal = +q.get('fin'); setFinale(FIN.t); }   // &fin=0..2750 freezes the finale at that ms
+    if (q.has('build')) buildUp();
     if (q.has('cut')) { flash.classList.add('run'); flash.style.animationDelay = `-${+q.get('cut')}s`; flash.style.animationPlayState = 'paused'; }
   } else {
     const start = () => setPerson(0, 0);

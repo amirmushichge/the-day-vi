@@ -32,6 +32,15 @@ Start frames are in [`sources/`](sources/).
 **Cost** (LTX pricing, Nov 2026): per person one 8 s turn ($1.36) + one 8 s flyover ($1.36) + Alpha Gen on the
 turn ($0.80) ≈ **$3.50**, so about **$21** for all six.
 
+## LTX links
+
+- **LTX console** (API keys, usage, top-ups): https://console.ltx.io
+- **Docs:** https://docs.ltx.io
+- **LTX-2.5 model:** https://docs.ltx.io/models/ltx-2-5
+- **Image-to-video API** (head turns, flyovers): https://docs.ltx.io/api-documentation/api-reference/async-video-generation/submit-image-to-video
+- **Alpha Gen API** (the mattes): https://docs.ltx.io/api-documentation/api-reference/async-video-generation/submit-video-alpha-gen
+- **Prompting guide:** https://docs.ltx.io/api-documentation/implementation-guides/prompting-guide
+
 ## Run it
 
 ```bash
@@ -41,7 +50,7 @@ node tools/serve.mjs .            # http://localhost:5173  (a server with HTTP R
 Make your own footage:
 
 ```bash
-cp .env.example .env              # put your LTX API key in it
+cp .env.example .env              # put your LTX API key in it (create one at https://console.ltx.io)
 python tools/ltx.py video prompts/ltx-jobs.json turn-baker --budget 25
 python tools/ltx.py alpha footage/turn-baker --budget 25
 python tools/ltx.py video prompts/ltx-jobs.json fly-baker --budget 25
@@ -62,6 +71,8 @@ In `index.html`:
 - `PALETTES`: colour layouts; `7` is the one live. `?pal=1..9` previews the others, `?hero=4&frame=60` freezes a scene.
 
 Or hand the whole thing to Claude Code with [`PROMPT.md`](PROMPT.md).
+
+`build.html` replays how a scene is assembled (flyover, cut-out, double exposure, background, site) and `explodeLayers()` in the page lifts every layer apart in 3D; both are only for recording the tutorial.
 
 ![LTX settings](docs/ltx-settings.png)
 

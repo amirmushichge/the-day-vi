@@ -26,7 +26,7 @@ Work in this order and show me each result before the next step:
    (LTX-2.5 Pro, 1920×1080, 24 fps, 8 s, `camera_motion: static`) and a `fly-<key>` job. In the turn prompt keep the
    framing locked ("tripod shot, the framing never changes, does not zoom, the person stays the same size"), freeze the
    shoulders and ask for a slow, even turn of the head only. Describe each person's clothes and accessories so they stay.
-4. **Render.** My LTX key is in `.env`. Run one turn first and show me a contact sheet (ffmpeg, 2 frames per second)
+4. **Render.** My LTX key is in `.env` (keys live at https://console.ltx.io; API reference at https://docs.ltx.io). Run one turn first and show me a contact sheet (ffmpeg, 2 frames per second)
    before rendering the rest. Then run all jobs with `tools/ltx.py` and `--budget`, and Alpha Gen on every turn.
 5. **Pack.** Find where each turn really ends (the frame where the eyes meet the lens) and run `tools/pack.py turn`
    with `--to` set to a few frames after it; run `tools/pack.py city` for every flyover.
